@@ -64,13 +64,18 @@ for(i in 1:length(samplelist)){
 ```
 
 # Remove duplicates with picard
-```{python}
+```{r}
 # Move files to picard/data
 # cd picard
 
 # Do this with each sample
 java -jar build/libs/picard.jar MarkDuplicates \
 --INPUT data/sample1_sorted.bam --OUTPUT data/sample1_deduplicated.bam --METRICS_FILE data/sample1_metrics.txt --REMOVE_DUPLICATES true
+```
+
+# Peak calling with macs3
+```{r}
+macs3 callpeak -t picard/data/sample1_deduplicated.bam -n sample1 -f BAMPE --outdir data/macs3_callpeak -g mm 
 
 # Move files back to outputdir
 ```
@@ -100,6 +105,3 @@ for(i in 1:length(samplelist)){
   export.bw(read_coverage, paste0(outputdir, samplelist[i], ".bw"))
 }
 ```
-
-
-
