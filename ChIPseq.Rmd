@@ -8,7 +8,7 @@ output: html_document
 ChIPseq read processing and mapping (single-end samples)
 
 # Load libraries
-```{r setup, include=FALSE}
+```{r}
 library(Rfastp)
 library(Rsubread)
 library(Rsamtools)
