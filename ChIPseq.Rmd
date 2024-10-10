@@ -1,0 +1,76 @@
+---
+title: "ChIPseq"
+author: "Kärt Mätlik"
+date: "2024-10-10"
+output: html_document
+---
+
+ChIPseq read processing and mapping (single-end samples)
+
+# Load libraries
+```{r setup, include=FALSE}
+library(Rfastp)
+library(Rsubread)
+library(Rsamtools)
+library(tidyverse)
+library(magrittr)
+```
+
+# Set up files & directories
+```{r}
+read_1 <- c("R1_001.fastq.gz", "R1_002.fastq.gz", "R1_003.fastq.gz")
+outputdir <- "C:/Users/kvare/Documents/Seq/ChIP/"
+samplelist <- c("sample1", "sample2", "sample3")
+ref_genome <- "C:/Users/kvare/Documents/Seq/RefGenome/mm10_mainchrs"
+```
+
+# Quality control & trimming
+```{r}
+for(i in 1:length(samplelist)){
+  qc_report <- rfastp(
+    read1 = read_1[i],
+    outputFastq = paste0(outputdir, samplelist[i])
+  )
+}
+```
+
+# Mapping to reference genome
+```{r}
+for(i in 1:length(samplelist)){
+  
+  # Align to reference genome
+  mapping_report <- align(index = ref_genome,
+                             readfile1 = paste0(outputdir, samplelist[i], "_R1.fastq.gz"),
+                             output_format = "BAM",
+                             output_file = paste0(outputdir, samplelist[i], ".bam"), 
+                             type = "dna",
+                             phredOffset = 33, 
+                             nthreads = 8,
+                             readGroupID = samplelist[i],
+                             unique = TRUE)
+  mapping_report %>% write.table(paste0(outputdir, samplelist[i], "_mapping_summary.csv"))
+  
+  # Sort and index BAM
+  sortBam(file = paste0(outputdir, samplelist[i], ".bam"), 
+          destination = paste0(outputdir, samplelist[i], "_sorted"))
+  indexBam(paste0(outputdir, samplelist[i], "_sorted.bam"))
+  
+  # Remove unsorted bam file to save space
+  file.remove(paste0(outputdir, samplelist[i], ".bam"))
+}
+```
+
+# Create bigwigs
+```{r}
+for(i in 1:length(samplelist)){
+  # Mapping summary over chromosomes
+  mapped_stats <- idxstatsBam(paste0(outputdir, samplelist[i], "_sorted.bam"))
+  mapped_stats %>% write_csv(paste0(outputdir, samplelist[i], "_mapped_stats.csv"))
+  
+  # Create bigwig files
+  read_coverage <- coverage(paste0(outputdir, samplelist[i], "_sorted.bam"),
+                            weight = (10^6)/sum(mapped_stats[,"mapped"]))
+  export.bw(read_coverage, paste0(outputdir, samplelist[i], ".bw"))
+}
+```
+
