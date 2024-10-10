@@ -22,7 +22,7 @@ read_1 <- c("R1_001.fastq.gz", "R1_002.fastq.gz", "R1_003.fastq.gz")
 read_2 <- c("R2_001.fastq.gz", "R2_002.fastq.gz", "R2_003.fastq.gz")
 outputdir <- "C:/Users/kvare/Documents/Seq/ATAC/"
 samplelist <- c("sample1", "sample2", "sample3")
-ref_genome <- "C:/Users/kvare/Documents/HattenLab/LinuxFiles/reChIP_041120/mm10_mainchrs"
+ref_genome <- "C:/Users/kvare/Documents/Seq/RefGenome/mm10_mainchrs"
 ```
 
 # Quality control & trimming
