@@ -12,6 +12,8 @@ ATACseq read processing and mapping (paired-end samples)
 library(Rfastp)
 library(Rsubread)
 library(Rsamtools)
+library(tidyverse)
+library(magrittr)
 ```
 
 # Set up files & directories
