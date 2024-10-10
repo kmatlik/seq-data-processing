@@ -1,0 +1,103 @@
+---
+title: "ATACseq"
+author: "Kärt Mätlik"
+date: "2024-10-10"
+output: html_document
+---
+
+ATACseq read processing and mapping (paired-end samples)
+
+# Load libraries
+```{r setup, include=FALSE}
+library(Rfastp)
+library(Rsubread)
+library(Rsamtools)
+```
+
+# Set up files & directories
+```{r}
+read_1 <- c("R1_001.fastq.gz", "R1_002.fastq.gz", "R1_003.fastq.gz")
+read_2 <- c("R2_001.fastq.gz", "R2_002.fastq.gz", "R2_003.fastq.gz")
+outputdir <- "C:/Users/kvare/Documents/Seq/ATAC/"
+samplelist <- c("sample1", "sample2", "sample3")
+ref_genome <- "C:/Users/kvare/Documents/HattenLab/LinuxFiles/reChIP_041120/mm10_mainchrs"
+```
+
+# Quality control & trimming
+```{r}
+for(i in 1:length(samplelist)){
+  qc_report <- rfastp(
+    read1 = read_1[i],
+    read2 = read_2[i],
+    outputFastq = paste0(outputdir, samplelist[i])
+  )
+}
+```
+
+# Mapping to reference genome
+```{r}
+for(i in 1:length(samplelist)){
+  
+  # Align to reference genome
+  mapping_report <- align(index = ref_genome,
+                             readfile1 = paste0(outputdir, samplelist[i], "_R1.fastq.gz"),
+                             readfile2 = paste0(outputdir, samplelist[i], "_R2.fastq.gz"),
+                             output_format = "BAM",
+                             output_file = paste0(outputdir, samplelist[i], ".bam"), 
+                             type = "dna",
+                             phredOffset = 33, 
+                             nthreads = 8,
+                             readGroupID = samplelist[i],
+                             unique = TRUE,
+                             maxFragLength = 2000)
+  mapping_report %>% write.table(paste0(outputdir, samplelist[i], "_mapping_summary.csv"))
+  
+  # Sort BAM
+  sortBam(file = paste0(outputdir, samplelist[i], ".bam"), 
+          destination = paste0(outputdir, samplelist[i], "_sorted"))
+  
+  # Remove unsorted bam file to save space
+  file.remove(paste0(outputdir, samplelist[i], ".bam"))
+}
+```
+
+# Remove duplicates with picard
+```{python}
+# Move files to picard/data
+# cd picard
+
+# Do this with each sample
+java -jar build/libs/picard.jar MarkDuplicates \
+--INPUT data/sample1_sorted.bam --OUTPUT data/sample1_deduplicated.bam --METRICS_FILE data/sample1_metrics.txt --REMOVE_DUPLICATES true
+
+# Move files back to outputdir
+```
+
+# Index BAMs
+```{r}
+for(i in 1:length(samplelist)){
+  indexBam(paste0(outputdir, samplelist[i], "_deduplicated.bam"))
+}
+
+# Remove sorted files that did not have duplicates removed to save space
+for(i in 1:length(samplelist)){
+  file.remove(paste0(outputdir, samplelist[i], "_sorted.bam"))
+}
+```
+
+# Create bigwigs
+```{r}
+for(i in 1:length(samplelist)){
+  # Mapping summary over chromosomes
+  mapped_stats <- idxstatsBam(paste0(outputdir, samplelist[i], "_deduplicated.bam"))
+  mapped_stats %>% write_csv(paste0(outputdir, samplelist[i], "_mapped_stats.csv"))
+  
+  # Create bigwig files
+  read_coverage <- coverage(paste0(outputdir, samplelist[i], "_deduplicated.bam"),
+                            weight = (10^6)/sum(mapped_stats[,"mapped"]))
+  export.bw(read_coverage, paste0(outputdir, samplelist[i], ".bw"))
+}
+```
+
+
+
