@@ -1,1 +1,1 @@
-# seq-data-processing
+# Code for processing sequencing data
