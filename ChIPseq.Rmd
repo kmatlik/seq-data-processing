@@ -1,11 +1,11 @@
 ---
-title: "ChIPseq"
+title: "ChIPseq read processing and mapping"
 author: "Kärt Mätlik"
 date: "2024-10-10"
 output: html_document
 ---
 
-ChIPseq read processing and mapping (single read samples)
+- test picard and macs3
 
 # Load libraries
 ```{r}

@@ -1,11 +1,9 @@
 ---
-title: "ATACseq"
+title: "ATACseq read processing and mapping (paired-end samples)"
 author: "Kärt Mätlik"
 date: "2024-10-10"
 output: html_document
 ---
-
-ATACseq read processing and mapping (paired-end samples)
 
 # Load libraries
 ```{r setup, include=FALSE}

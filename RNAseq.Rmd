@@ -1,11 +1,10 @@
 ---
-title: "RNAseq"
+title: "RNAseq read processing and mapping"
 author: "Kärt Mätlik"
 date: "2024-10-10"
 output: html_document
 ---
 
-RNAseq read processing and mapping
 -add counts over exons
 -add counts for nuclear RNAseq
 
