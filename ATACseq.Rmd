@@ -84,11 +84,10 @@ java -jar build/libs/picard.jar AddOrReplaceReadGroups \
 java -jar build/libs/picard.jar MarkDuplicates \
 --INPUT data/sample1_with_RG.bam --OUTPUT data/sample1_deduplicated.bam --METRICS_FILE data/sample1_metrics.txt --REMOVE_DUPLICATES true
 
-
 # Peak calling with macs3 (paired end mode)
 macs3 callpeak -t picard/data/sample1_deduplicated.bam -n sample1 -f BAMPE --outdir data/macs3_callpeak -g mm 
 
-# Move files back to outputdir.
+# Move deduplicated files back to outputdir.
 # Delete _sorted.bam and _with_RG.bam files.
 ```
 
