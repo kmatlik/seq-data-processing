@@ -5,7 +5,7 @@ date: "2024-10-10"
 output: html_document
 ---
 
-ChIPseq read processing and mapping (single-end samples)
+ChIPseq read processing and mapping (single read samples)
 
 # Load libraries
 ```{r}
@@ -46,17 +46,50 @@ for(i in 1:length(samplelist)){
                              type = "dna",
                              phredOffset = 33, 
                              nthreads = 8,
-                             readGroupID = samplelist[i],
                              unique = TRUE)
   mapping_report %>% write.table(paste0(outputdir, samplelist[i], "_mapping_summary.csv"))
   
   # Sort and index BAM
   sortBam(file = paste0(outputdir, samplelist[i], ".bam"), 
           destination = paste0(outputdir, samplelist[i], "_sorted"))
-  indexBam(paste0(outputdir, samplelist[i], "_sorted.bam"))
   
   # Remove unsorted bam file to save space
   file.remove(paste0(outputdir, samplelist[i], ".bam"))
+}
+```
+
+# Remove duplicates and call peaks
+```{r, eval = F}
+# Move files to picard/data
+cd picard
+
+# Run the following for each sample.
+
+# Define read groups in bam files using picard. See https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups for details
+java -jar build/libs/picard.jar AddOrReplaceReadGroups \
+      I=data/sample1_sorted.bam \
+      O=data/sample1_with_RG.bam \
+      RGID=1 \
+      RGLB=lib1 \
+      RGPL=illumina \
+      RGPU=unit1 \
+      RGSM=1
+
+# Mark duplicates
+java -jar build/libs/picard.jar MarkDuplicates \
+--INPUT data/sample1_with_RG.bam --OUTPUT data/sample1_deduplicated.bam --METRICS_FILE data/sample1_metrics.txt --REMOVE_DUPLICATES true
+
+# Peak calling with macs3 (single read mode)
+macs3 callpeak -t picard/data/sample1_deduplicated.bam -n sample1 -f BAM --outdir data/macs3_callpeak -g mm 
+
+# Move deduplicated files back to outputdir.
+# Delete _sorted.bam and _with_RG.bam files.
+```
+
+# Index BAMs
+```{r}
+for(i in 1:length(samplelist)){
+  indexBam(paste0(outputdir, samplelist[i], "_deduplicated.bam"))
 }
 ```
 
@@ -64,13 +97,14 @@ for(i in 1:length(samplelist)){
 ```{r}
 for(i in 1:length(samplelist)){
   # Mapping summary over chromosomes
-  mapped_stats <- idxstatsBam(paste0(outputdir, samplelist[i], "_sorted.bam"))
+  mapped_stats <- idxstatsBam(paste0(outputdir, samplelist[i], "_deduplicated.bam"))
   mapped_stats %>% write_csv(paste0(outputdir, samplelist[i], "_mapped_stats.csv"))
   
   # Create bigwig files
-  read_coverage <- coverage(paste0(outputdir, samplelist[i], "_sorted.bam"),
+  read_coverage <- coverage(paste0(outputdir, samplelist[i], "_deduplicated.bam"),
                             weight = (10^6)/sum(mapped_stats[,"mapped"]))
   export.bw(read_coverage, paste0(outputdir, samplelist[i], ".bw"))
 }
 ```
+
 
