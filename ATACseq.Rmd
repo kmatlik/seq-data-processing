@@ -14,6 +14,7 @@ library(Rsubread)
 library(Rsamtools)
 library(tidyverse)
 library(magrittr)
+library(Herper)
 ```
 
 # Set up files & directories
@@ -49,7 +50,6 @@ for(i in 1:length(samplelist)){
                              type = "dna",
                              phredOffset = 33, 
                              nthreads = 8,
-                             readGroupID = samplelist[i],
                              unique = TRUE,
                              maxFragLength = 2000)
   mapping_report %>% write.table(paste0(outputdir, samplelist[i], "_mapping_summary.csv"))
@@ -63,32 +63,39 @@ for(i in 1:length(samplelist)){
 }
 ```
 
-# Remove duplicates with picard
-```{r}
+# Remove duplicates and call peaks
+```{r, eval = F}
 # Move files to picard/data
-# cd picard
+cd picard
 
-# Do this with each sample
+# Run the following for each sample.
+
+# Define read groups in bam files using picard. See https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups for details
+java -jar build/libs/picard.jar AddOrReplaceReadGroups \
+      I=data/sample1_sorted.bam \
+      O=data/sample1_with_RG.bam \
+      RGID=1 \
+      RGLB=lib1 \
+      RGPL=illumina \
+      RGPU=unit1 \
+      RGSM=1
+
+# Mark duplicates
 java -jar build/libs/picard.jar MarkDuplicates \
---INPUT data/sample1_sorted.bam --OUTPUT data/sample1_deduplicated.bam --METRICS_FILE data/sample1_metrics.txt --REMOVE_DUPLICATES true
-```
+--INPUT data/sample1_with_RG.bam --OUTPUT data/sample1_deduplicated.bam --METRICS_FILE data/sample1_metrics.txt --REMOVE_DUPLICATES true
 
-# Peak calling with macs3
-```{r}
+
+# Peak calling with macs3 (paired end mode)
 macs3 callpeak -t picard/data/sample1_deduplicated.bam -n sample1 -f BAMPE --outdir data/macs3_callpeak -g mm 
 
-# Move files back to outputdir
+# Move files back to outputdir.
+# Delete _sorted.bam and _with_RG.bam files.
 ```
 
 # Index BAMs
 ```{r}
 for(i in 1:length(samplelist)){
   indexBam(paste0(outputdir, samplelist[i], "_deduplicated.bam"))
-}
-
-# Remove sorted files that did not have duplicates removed to save space
-for(i in 1:length(samplelist)){
-  file.remove(paste0(outputdir, samplelist[i], "_sorted.bam"))
 }
 ```
 
