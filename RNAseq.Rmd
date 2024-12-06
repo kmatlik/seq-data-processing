@@ -18,6 +18,7 @@ library(tidyverse)
 library(magrittr)
 library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 library(DESeq2)
+library(rtracklayer)
 ```
 
 # Set up files & directories
