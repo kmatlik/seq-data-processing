@@ -60,7 +60,7 @@ for(i in 1:length(samplelist)){
           destination = paste0(outputdir, samplelist[i], "_sorted"))
   indexBam(paste0(outputdir, samplelist[i], "_sorted.bam"))
   
-  # Remove unsorted bam file to save space
+  # Remove unsorted bam files to save space
   file.remove(paste0(outputdir, samplelist[i], ".bam"))
 }
 ```
@@ -84,7 +84,7 @@ colnames(count_matrix) <- samplelist
 count_matrix %>% write.table(file = paste0(outputdir, "counts_exons.csv"))
 ```
 
-#Counts over genes
+#Counts over genebody
 ```{r}
 mm10_genes <- exonsBy(TxDb.Mmusculus.UCSC.mm10.knownGene, by = "gene")
 count_matrix_genebody <- matrix(data = 0, nrow = length(mm10_genes), ncol = length(samplelist))

@@ -54,7 +54,7 @@ for(i in 1:length(samplelist)){
   sortBam(file = paste0(outputdir, samplelist[i], ".bam"), 
           destination = paste0(outputdir, samplelist[i], "_sorted"))
   
-  # Remove unsorted bam file to save space
+  # Remove unsorted bam files to save space
   file.remove(paste0(outputdir, samplelist[i], ".bam"))
 }
 ```
