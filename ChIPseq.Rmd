@@ -14,6 +14,7 @@ library(Rsubread)
 library(Rsamtools)
 library(tidyverse)
 library(magrittr)
+library(rtracklayer)
 ```
 
 # Set up files & directories
