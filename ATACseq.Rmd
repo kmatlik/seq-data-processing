@@ -20,7 +20,7 @@ library(rtracklayer)
 ```{r}
 read_1 <- c("R1_001.fastq.gz", "R1_002.fastq.gz", "R1_003.fastq.gz")
 read_2 <- c("R2_001.fastq.gz", "R2_002.fastq.gz", "R2_003.fastq.gz")
-outputdir <- "C:/Users/kvare/Documents/Seq/ATAC/"
+outputdir <- "C:/Users/kvare/Documents/Seq/ATAC/Exp1"
 samplelist <- c("sample1", "sample2", "sample3")
 ref_genome <- "C:/Users/kvare/Documents/Seq/RefGenome/mm10_mainchrs"
 ```
