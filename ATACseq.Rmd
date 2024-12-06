@@ -13,6 +13,7 @@ library(Rsamtools)
 library(tidyverse)
 library(magrittr)
 library(Herper)
+library(rtracklayer)
 ```
 
 # Set up files & directories
