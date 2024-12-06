@@ -50,6 +50,18 @@ for(i in 1:length(samplelist)){
   file.remove(paste0(outputdir, samplelist[i], ".bam"))
 }
 
+# Create bigwigs
+for(i in 1:length(samplelist)){
+  # Mapping summary over chromosomes
+  mapped_stats <- idxstatsBam(paste0(outputdir, samplelist[i], "_sorted.bam"))
+  mapped_stats %>% write_csv(paste0(outputdir, samplelist[i], "_mapped_stats.csv"))
+  
+  # Create bigwig files
+  read_coverage <- coverage(paste0(outputdir, samplelist[i], "_sorted.bam"),
+                            weight = (10^6)/sum(mapped_stats[,"mapped"]))
+  export.bw(read_coverage, paste0(outputdir, samplelist[i], ".bw"))
+}
+
 # Counts over exons
 mm10_exons <- exonsBy(TxDb.Mmusculus.UCSC.mm10.knownGene, by = "gene")
 count_matrix <- matrix(data = 0, nrow = length(mm10_exons), ncol = length(samplelist))
