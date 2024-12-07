@@ -21,7 +21,7 @@ library(rtracklayer)
 # Set up files & directories
 ```{r}
 read_1 <- c("R1_001.fastq.gz", "R1_002.fastq.gz", "R1_003.fastq.gz", "R1_004.fastq.gz")
-outputdir <- "C:/Users/kvare/Documents/Seq/nRNAseq/Exp1"
+outputdir <- "C:/Users/kvare/Documents/Seq/nRNAseq/Exp1/"
 samplelist <- c("sample1", "sample2", "sample3", "sample4")
 samplegroups <- c("WT", "WT", "KO", "KO")
 ref_genome <- "C:/Users/kvare/Documents/Seq/RefGenome/mm10_mainchrs"
