@@ -21,6 +21,7 @@ library(rtracklayer)
 read_1 <- c("R1_001.fastq.gz", "R1_002.fastq.gz", "R1_003.fastq.gz")
 read_2 <- c("R2_001.fastq.gz", "R2_002.fastq.gz", "R2_003.fastq.gz")
 outputdir <- "C:/Users/kvare/Documents/Seq/ATAC/Exp1/"
+outputdir_wsl <- "/mnt/c/Users/kvare/Documents/Seq/ATAC/Exp1/" #This is required to run picard and macs3 through wsl. Note that the path starts with /mnt/c/ instead of C:/ 
 samplelist <- c("sample1", "sample2", "sample3")
 ref_genome <- "C:/Users/kvare/Documents/Seq/RefGenome/mm10_mainchrs"
 ```
@@ -62,35 +63,52 @@ for(i in 1:length(samplelist)){
 }
 ```
 
-# Remove duplicates and call peaks
-```{r, eval = F}
-# Move files to picard/data
-cd picard
+# Run picard to remove duplicates
+```{r}
+#Picard does not work on Windows, so I have installed it on WSL2. Before running MarkDuplicates, we need to add read group ID and other read groups to the bam file, because picard does not work without them. Unless you want to concatenate multiple bam files, it isn't very important what you set these values. See https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups for details
 
-# Run the following for each sample.
+#For wsl commands to run, it seems we need to include the absolute path to picard.jar from /home.
 
-# Define read groups in bam files using picard. See https://gatk.broadinstitute.org/hc/en-us/articles/360035890671-Read-groups for details
-java -jar build/libs/picard.jar AddOrReplaceReadGroups \
-      I=data/sample1_sorted.bam \
-      O=data/sample1_with_RG.bam \
-      RGID=1 \
-      RGLB=lib1 \
-      RGPL=illumina \
-      RGPU=unit1 \
-      RGSM=1
+#Run picard AddOrReplaceReadGroups to add read groups. This is required until I figure out how to add read groups with Rsubread readGroup ID.
+for(i in 1:length(samplelist)){
+  picard_command <- paste0("wsl java -jar /home/kart/picard/build/libs/picard.jar AddOrReplaceReadGroups -I ",
+                           outputdir_wsl, samplelist[i], "_sorted.bam",
+                           " -O ",
+                           outputdir_wsl, samplelist[i], "_withRG.bam",
+                           " -ID 1 -LB lib1 -PL illumina -PU unit1 -SM 1")
+  system(picard_command)
+}
 
-# Mark duplicates
-java -jar build/libs/picard.jar MarkDuplicates \
---INPUT data/sample1_with_RG.bam --OUTPUT data/sample1_deduplicated.bam --METRICS_FILE data/sample1_metrics.txt --REMOVE_DUPLICATES true
+#With only one sample run:
+#system("wsl java -jar /home/kart/picard/build/libs/picard.jar AddOrReplaceReadGroups -I /mnt/c/Users/kvare/Documents/Seq/ATAC/EzNd_CRB_7m_20241011/Ezh1WT_EzNd54_sorted.bam -O /mnt/c/Users/kvare/Documents/Seq/ATAC/EzNd_CRB_7m_20241011/Ezh1WT_EzNd54_withRG.bam -ID 1 -LB lib1 -PL illumina -PU unit1 -SM 1")
 
-# Peak calling with macs3 (paired end mode)
-macs3 callpeak -t picard/data/sample1_deduplicated.bam -n sample1 -f BAMPE --outdir data/macs3_callpeak -g mm 
+#Remove extra bam files to save space
+for(i in 1:length(samplelist)){
+  file.remove(paste0(outputdir, samplelist[i], "_sorted.bam"))
+}
 
-# Move deduplicated files back to outputdir.
-# Delete _sorted.bam and _with_RG.bam files.
+#picard MarkDuplicates
+for(i in 1:length(samplelist)){
+  picard_command <- paste0("wsl java -jar /home/kart/picard/build/libs/picard.jar MarkDuplicates -I ",
+                           outputdir_wsl, samplelist[i], "_withRG.bam",
+                           " -O ",
+                           outputdir_wsl, samplelist[i], "_deduplicated.bam",
+                           " -M ",
+                           outputdir_wsl, samplelist[i], "_metrix.csv, --REMOVE_DUPLICATES true")
+  system(macs_command)
+}
+
+#With only one sample run:
+#system("wsl java -jar /home/kart/picard/build/libs/picard.jar MarkDuplicates -I /mnt/c/Users/kvare/Documents/Seq/ATAC/EzNd_CRB_7m_20241011/Ezh1WT_EzNd54_withRG.bam -O /mnt/c/Users/kvare/Documents/Seq/ATAC/EzNd_CRB_7m_20241011/Ezh1WT_EzNd54_deduplicated.bam -M /mnt/c/Users/kvare/Documents/Seq/ATAC/EzNd_CRB_7m_20241011/Ezh1WT_EzNd54_metrix.csv --REMOVE_DUPLICATES true")
+
+
+#Remove extra bam files to save space
+for(i in 1:length(samplelist)){
+  file.remove(paste0(outputdir, samplelist[i], "_withRG.bam"))
+}
 ```
 
-# Index BAMs
+# Index deduplicated BAMs
 ```{r}
 for(i in 1:length(samplelist)){
   indexBam(paste0(outputdir, samplelist[i], "_deduplicated.bam"))
@@ -110,3 +128,27 @@ for(i in 1:length(samplelist)){
   export.bw(read_coverage, paste0(outputdir, samplelist[i], ".bw"))
 }
 ```
+
+# Peak calling with macs3
+```{r}
+#macs3 does not work on Windows, so I have installed it to WSL2. We need to provide the absolute path to macs3 (can check this by running which macs3 on Linux terminal). Also you may need to add macs3 to your PATH (I don't know if this is actually required). 
+
+#This is the code you would run directly from Linux terminal. 
+#macs3 callpeak -t data/sample1_deduplicated.bam -n sample1 -f BAMPE --outdir data/macs3_callpeak -g mm 
+
+#Run macs3 callpeak
+for(i in 1:length(samplelist)){
+  macs_command <- paste0(c("wsl /home/kart/miniconda3/bin/macs3 callpeak -t "), 
+                       outputdir_wsl, samplelist[i], "_deduplicated.bam",
+                       " -n ",
+                       samplelist[i],
+                       " -f BAMPE --outdir ",
+                       outputdir_wsl,
+                       " -g mm")
+  system(macs_command)
+}
+
+#With only one sample run:
+#system("wsl /home/kart/miniconda3/bin/macs3 callpeak -t /mnt/c/Users/kvare/Documents/Seq/ATAC/EzNd_CRB_7m_20241011/Ezh1WT_EzNd74_deduplicated.bam -n Ezh1WT_EzNd74 -f BAMPE --outdir /mnt/c/Users/kvare/Documents/Seq/ATAC/EzNd_CRB_7m_20241011/ -g mm)
+```
+
