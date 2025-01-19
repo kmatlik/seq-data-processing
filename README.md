@@ -9,7 +9,7 @@ This repository contains workflows for quality control (Rfastp), mapping (Rsubre
 
 The code is set up for R/RStudio installed on Windows, using WSL2 (Ubuntu) for packages that do not work on R or Windows (picard, macs3).
 
-Some parts of the workflows are prepared with help from Rockefeller University Bioinformatics Resource Center training courses (https://rockefelleruniversity.github.io/).
+Part of the workflows is prepared with help from Rockefeller University Bioinformatics Resource Center training courses (https://rockefelleruniversity.github.io/).
 
 ## Running the script
 Code:
@@ -18,7 +18,7 @@ Rscript --vanilla myscript.R arg1 arg2 arg3
 ```
 arg1 = absolute path to sample sheet (xlsx file) 
 arg2 = absolute path to output directory 
-arg3 = type of sequencing data; one of the following values: "ATAC", "ChIP", "RNA", "nRNA" 
+arg3 = type of sequencing data; one of the following: "ATAC", "ChIP", "RNA", "nRNA" 
 
 Example: 
 ```
