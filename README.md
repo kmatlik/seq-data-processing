@@ -13,10 +13,14 @@ Some parts of the workflows are prepared with help from Rockefeller University B
 
 ## Running the script
 Code:
+```
 Rscript --vanilla myscript.R arg1 arg2 arg3
-arg1 = absolute path to sample sheet (xlsx file)
-arg2 = absolute path to output directory
-arg3 = type of sequencing data; one of the following values: "ATAC", "ChIP", "RNA", "nRNA"
+```
+arg1 = absolute path to sample sheet (xlsx file) 
+arg2 = absolute path to output directory 
+arg3 = type of sequencing data; one of the following values: "ATAC", "ChIP", "RNA", "nRNA" 
 
 Example: 
+```
 Rscript --vanilla myscript.R "C:/Users/kvare/Documents/Sequencing/sample_info.xlsx" "C:/Users/kvare/Documents/Sequencing/Exp1/" "ATAC"
+```
