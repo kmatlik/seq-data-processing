@@ -13,11 +13,11 @@ Part of the workflows is prepared with help from Rockefeller University Bioinfor
 
 ## Sample information
 Sample information should be provided as an Excel file with the following column names:
-SampleName = list of samples, including ChIPseq input samples
-SampleGroup = experimental group, required for DESeq2 (ATACseq, RNAseq, and nRNAseq)
-Read1 = path to Read 1
-Read2 = path to Read 2, required for ATACseq
-InputName = sample to be used as input, required for ChIPseq peak calling with MACS3
+SampleName = list of samples, including ChIPseq input samples  
+SampleGroup = experimental group, required for DESeq2 (ATACseq, RNAseq, and nRNAseq)  
+Read1 = path to Read 1  
+Read2 = path to Read 2, required for ATACseq  
+InputName = sample to be used as input, required for ChIPseq peak calling with MACS3  
 
 Example:
  | SampleName | SampleGroup | Read1           | Read2           | InputName |
