@@ -32,9 +32,9 @@ Code:
 ```
 Rscript --vanilla myscript.R arg1 arg2 arg3
 ```
-arg1 = absolute path to sample sheet (xlsx file) 
-arg2 = absolute path to output directory 
-arg3 = type of sequencing data; one of the following: "ATAC", "ChIP", "RNA", "nRNA" 
+- arg1 = absolute path to sample sheet (xlsx file) 
+- arg2 = absolute path to output directory 
+- arg3 = type of sequencing data; one of the following: "ATAC", "ChIP", "RNA", "nRNA" 
 
 Example: 
 ```
