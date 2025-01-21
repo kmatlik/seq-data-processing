@@ -11,13 +11,12 @@ library(rtracklayer)
 #ATAC DE peaks
 
 #Test arguments
-args <- c("C:/Users/kvare/Documents/Seq/sample_info.xlsx", "C:/Users/kvare/Documents/Seq/ATACseq/Exp1/", "ATAC") #path to sampleinfo, outputdir
+#args <- c("C:/Users/kvare/Documents/Seq/sample_info.xlsx", "C:/Users/kvare/Documents/Seq/ATACseq/Exp1/", "ATAC") #path to sampleinfo, outputdir
 
-#args <- commandArgs(TRUE)
+#Run this
+#Rscript --vanilla .\scripts\myscript.R "C:/Users/kvare/Documents/Seq/sample_info.xlsx" "C:/Users/kvare/Documents/Seq/ATACseq/Exp1/" "ATAC" > C:\Users\kvare\Documents\Seq\output.Rout 2>&1
 
-#args[1] = path to sample sheet (Excel file)
-#args[2] = output directory
-#args[3] = one of the following: "ATAC", "ChIP", "nRNA", "RNA"
+args <- commandArgs(TRUE)
 
 if (length(args)<3) {
   
@@ -35,7 +34,7 @@ if (length(args)<3) {
   samplegroups <- data_table$SampleGroup
 
   outputdir <- args[2]
-  outputdir_wsl <- paste0("/mnt/c", strsplit(args[2], split = ":")[[1]][2]) #Changing to wsl compatible path. This is required to run picard and macs3 through wsl. Note that the path starts with /mnt/c/ instead of C:/ 
+  outputdir_wsl <- paste0("/mnt/c", strsplit(args[2], split = ":")[[1]][2]) #Changing to wsl compatible path.  
   ref_genome <- "C:/Users/kvare/Documents/Seq/RefGenome/mm10_mainchrs"
   id_to_symbol <- read_csv("C:/Users/kvare/Documents/Seq/mm10_id_to_symbol.csv")
 
