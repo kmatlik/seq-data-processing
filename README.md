@@ -32,11 +32,6 @@ Example:
  | sample3    | group2      | R1_003.fastq.gz | R2_003.fastq.gz | sample4   |
  | sample4    | group2      | R1_004.fastq.gz | R2_004.fastq.gz | sample4   |
 
-```
-# How to add data_table as example here?
-data_table
-```
-
 ## Running the script
 Code:
 ```
