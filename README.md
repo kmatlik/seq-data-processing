@@ -9,7 +9,7 @@ This repository contains workflows for quality control (Rfastp), mapping (Rsubre
 
 The code is set up for R/RStudio installed on Windows, using WSL2 (Ubuntu) for packages that do not work on R or Windows (picard, macs3).
 
-Part of the workflows is prepared with help from Rockefeller University Bioinformatics Resource Center training courses (https://rockefelleruniversity.github.io/).
+Workflows were prepared with help from Rockefeller University Bioinformatics Resource Center and their training courses (https://rockefelleruniversity.github.io/).
 
 ## Sample information
 Sample information should be provided as an Excel file with the following column names (see template):  
