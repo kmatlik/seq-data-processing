@@ -203,7 +203,7 @@ if (length(args)<3) {
     count_matrix %>% write.table(file = paste0(outputdir, "counts_exons.csv"))
     
     # Counts over genebody
-    mm10_genes <- exonsBy(TxDb.Mmusculus.UCSC.mm10.knownGene, by = "gene")
+    mm10_genes <- genes(TxDb.Mmusculus.UCSC.mm10.knownGene)
     count_matrix_genebody <- matrix(data = 0, nrow = length(mm10_genes), ncol = length(samplelist))
     
     for(i in 1:length(samplelist)){
